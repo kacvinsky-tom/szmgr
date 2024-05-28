@@ -94,6 +94,7 @@ viz  [otázka 7](./7_distribuovane_systemy.md#rozd%C3%ADl-mezi-centralizovanou-a
 - data jsou podle indexů seřazena na uzlech a tyto operace jsou efektivní
 - můžeme mít jednoklíčový index, jejich směs, konkrétní hodnoty v polích atd.
 - pokud máme špatně nastavené indexy, tak se obíráme o možnosti NoSQL databází, protože pro dotaz musíme procházet všechny nodes a zatěžujeme je tak
+- podporuje MapReduce, velmi užitečné, pokud děláme agregace na všechny data, nebo na jejich rozsahy -> každý uzel si zpracuje svoji část
 ### Column-family
 ![](img/cassandra.png)
 - sloupec je definován většinou jako key-value (název sloupce a jeho hodnota), řádek může libovolný počet sloupců
@@ -104,7 +105,6 @@ viz  [otázka 7](./7_distribuovane_systemy.md#rozd%C3%ADl-mezi-centralizovanou-a
 - dynamický mód se hodí, když například ukládáme časovou řadu, nemusíme předem definovat sloupce a jejich názvy
 - Cassandra dokáže dávat jednotlivým sloupcům různá pravidla na opravu atd.
 - Cassandra používá P2P topologii, uživatel může nastavit i různé pravidla pro zápis a čtení (jako quorum, opravy nekonzistence atd.)
-- většina Column-family má optimalizované dotazy na celé sloupce a partitioning podle sloupců, Cassandra ho má podle řádků a podobá se tak trošku víc klasickým DB
 ### Graph based
 ![](img/graph.png)
 - o dost víc odlišné než předchozí typy
@@ -113,17 +113,25 @@ viz  [otázka 7](./7_distribuovane_systemy.md#rozd%C3%ADl-mezi-centralizovanou-a
 - může poskytovat zajímavé dotazy: najdi všechny uzly s vlastností "kniha", "časopis" a které "obsahují" "obrázek
 - mají několik typů zápisu:
 1) **Adjacency Matrix** - každý uzel je řádek a má 1/0 u sloupce - index sloupce značí další uzel a 0/1 pokud obsahuje hranu, když jsou hrany bez směrů, tak je matice totožná přes uhlopříčku, jinak dokážeme zaznamenat, jestli vede hrana do uzlu, nebo z uzlu - můžeme přidávat i hodnoty/váhy hran -> u vlastností to může být třeba bitmapa, má velmi optimalizované dotazy na existující hranu a případně její hodnotu, také na přidávání, nevýhody jsou v zabírání místa
-2) **Adjacency list** - množina seznamů, u každého uzlu je odkaz na uzel, na který ukazuje a případně hodnota hrany, zabírá méně místa v grafech, kde není moc hran a efektivní přidávání uzlů, při grafu, kde je více hran může být neefektivní dotaz, jestli uzel A obsahuje hranu do uzlu B -> optimalizace v tříděných grafech
-3) **Incidence matrix** - tabulka počet vrcholů x počet uzlů, je výhoda, když chceme znázornit, že jedna hrana spojuje víc uzlů -> **hypergrafy**
+2) **Adjacency list** - množina seznamů, u každého uzlu je odkaz na uzel, na který ukazuje a případně hodnota hrany, zabírá méně místa v grafech, kde není moc hran a efektivní přidávání uzlů, při grafu, kde je více hran může být neefektivní dotaz, jestli uzel A obsahuje hranu do uzlu B -> optimalizace v setřízených listech
+3) **Incidence matrix** - tabulka počet vrcholů x počet hran, je výhoda, když chceme znázornit, že jedna hrana spojuje víc uzlů -> **hypergrafy**
 - existují metody, jak upravit graf -> **BFS** - spustíme BFS od kořene a upravíme graf podle pořadí, umožňuje optimalizovaný průchod od kořene, horší, když chceme potom procházet od jiných prvků, čím níž tím horší
 - **Graph partitioning** - snažíme se rozdělit graf na menší skupiny, aby mezi sebou sdíleli co nejméně hran, nebo uzlů -> to nám pomůže při paralelním zpracování
 - jsou jednorelační grafy, kdy všechny hrany představují určitou vlastnost, nebo můžou potom obsahovat množinu různých atributů,
 - jsou transakční grafy, které jsou menší a je jich větší počet(biologické cesty), nebo netransakční, ty jsou velké a je jich málo (vztahy v sociální síti)
 - můžeme se ptát na podgrafy, podobné grafy atd.
 - populární je Neo4J -> dokáže aplikovat ACID jako SQL, což se dost liší od dalších DB, které jsou spíše BASE
-- uzel v Neo4J je jednotka, která má nějaké vlastnosti a může mít vztahy s ostantími uzly, vztahy mají taky vlastnosti
-- vlastnost má klíč a k němu hodnotu
-- vztahy mezi uzly můžou patřit do nějakých rodin, můžou být směrované
-- můžeme vytvořit nějaké labely se jménem a přiřadit jim uzly
+- uzel v Neo4J je jednotka, která má nějaké vlastnosti a může mít vztahy s ostatními uzly, vztahy mají taky vlastnosti
+- vlastnost má klíč a k němu hodnotu -> age: "Simon"
+- vztahy mezi uzly mají nějaký typ, můžou být také směrované -> OWNS 
+- uzel má nějaký label -> Person
 - cesta potom je nějaká konkrétní cesta z uzlu A do B pomocí hran a vztahů, hledá se nějaký podgraf, nebo cesta
+- oproti SQL mají např. dobře implementovatelný tranzitivní uzávěr
+- grafové databáze jsou o dost víc často centralizované oproti předchozím typům
 - Grafová databáze je vhodná pro situace, kde je potřeba aktualizovat mnoho entit současně a provádět komplexní analytické dotazy, ale může být méně vhodná pro manipulaci s velkými binárními objekty, zpracování obrovských datových sad a v případech, kde je distribuce grafu náročná.
+- Grafové databáze jsou neoptimalizované pro dotazy vyžadující rozsáhlé agregace, full-table scany, komplexní JOIN operace a analytické dotazy nezávislé na vztazích mezi daty, protože jsou primárně navrženy pro efektivní procházení a analýzu vztahů mezi entitami.
+
+
+
+
+

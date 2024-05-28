@@ -8,8 +8,10 @@ Aspekty ovlivňující bezpečnost systému na úrovni jeho infrastruktury jsou 
 - **Fyzická bezpečnost** - ochrana hardwarových komponent, datových center a dalších fyzických prostředků před neoprávněným přístupem, poškozením nebo krádeží. Opatření pro vyšší bezpečnost mohou zahrnovat správné nastavení přístupu do datového centra, opatření proti požáru apod.
 - **Zabezpečení dat** - opatření k ochraně dat uložených v systému. Zvyšování můžeme dělat například šifrováním. Efektivní správa šifrovacích klíčů je zásadní pro zabezpečení dat; šifrovací klíče by měly být uchovávány odděleně od šifrovaných dat. Dnes je to běžné v cloudech, kde na to existují speciální zdroje jako v Azure Key Vault
 Jako příklad je také solení hesel. V historii se mnohokrát stalo, že unikly databáze uživatelů a solení pomohlo před odhalením hesel uživatelů v raw formě.
-Další příklad zabezpečení dat je pravidelné zálohování, která ma za úkol obnovu např. v případě výpadku systému. U zálohování je také třeba dbát na více úrovní zálohování, když by jednotlivé úrovně selhaly, nebo byly zasaženy taky např. požárem datacentra.
-- **Aktualizace a správa záplat** - pravidelné aktualizace softwaru a hardwaru, aby se zajistilo, že jsou všechny systémové komponenty chráněny proti nejnovějším bezpečnostním hrozbám. Většina aplikací používá nějaké dependence, nebo third party software. Jedná se o knihovny v kódu, SW pro DB atd. Staré verze těchto aplikací obsahují dost často již objevené vulnerability.
+Další příklad zabezpečení dat je pravidelné zálohování, která ma za úkol obnovu např. v případě výpadku systému, nebo když je systém napadený ransomwarem. U zálohování je také třeba dbát na více úrovní zálohování, když by jednotlivé úrovně selhaly, nebo byly zasaženy taky např. požárem datacentra.
+#### Aktualizace a správa záplat
+Pravidelné aktualizace softwaru a hardwaru, aby se zajistilo, že jsou všechny systémové komponenty chráněny proti nejnovějším bezpečnostním hrozbám. Většina aplikací používá nějaké dependence, nebo third party software. Jedná se o knihovny v kódu, SW pro DB atd. Staré verze těchto aplikací obsahují dost často již objevené vulnerability.
+
 Je tak nutné sledovat a aktualizovat. Dnes již existuje SW, který dokáže tyto věci automatizovat jako např. Snyk. Je dobré dělat pravidelné bezpečnostní audity softwaru pro odhalení možných slabých míst.
 - **Identity a přístupové managementy (IAM)** - správa uživatelských identit a jejich přístupových práv k zajištění, že jen oprávnění uživatelé mají přístup k citlivým systémovým zdrojům. Každý uživatel/admin by měl dostat přístup jen k částem, ke kterým ho přistupuje. Nemělo by se jít opačnou metodou, tedy povolit přístup ke všemu a následně omezovat, to je mnohem náchylnější na chyby.
 Mnoho časté byly i útoky, kde nebyla víceúrovňová autentizace. Zaměstnanec se např. mohl přihlásit pouze SSH klíčem. Dnes je to ošetřeno již nutným přístupem do vnitřní sítě, 2FA atd. Politiky minimálních oprávnění a pravidelné revize oprávnění jsou klíčové pro zamezení nadměrného přístupu a potenciálního zneužití oprávnění. Víceúrovňová autentizace, včetně biometrických metod, může výrazně zvýšit zabezpečení přístupu k citlivým systémům.
@@ -36,40 +38,50 @@ Síťová bezpečnost je klíčovým aspektem ochrany IT infrastruktury organiza
 ## Kyberbezpečnostní hrozby a příklady útoků 
 ![](img/threat_vuln.png)
 
-Analýza rizik identifikuje možná rizika a identifikuje možná vylepšení. Útok je konkrétní akt prolomení bezpečnostních kontrol a vniku do systému, kde může udělat aktivní změny, nebo jen např. pasivně vytáhnout nějaká data. Útok nemusí být vždy úspěšný a může zůstat u stádia pokusu. Daný útok nemusí využívat jen jedné vulnerability/threatu, může se jednat o kombinaci, která dovolí útočníkovi proniknout do systému.
+Analýza rizik identifikuje možná rizika a identifikuje možná vylepšení. Útok je konkrétní akt prolomení bezpečnostních kontrol a vniku do systému, kde může udělat aktivní změny, nebo jen např. pasivně vytáhnout nějaká data. Útok nemusí být vždy úspěšný a může zůstat u stádia pokusu. Daný útok nemusí využívat jen jedné vulnerability/threatu, může se jednat o kombinaci, která dovolí útočníkovi proniknout do systému. U hrozeb je také dobré zohledňovat věci jako:
+- **Kontext** - proč se útočník snaží získat přístup nad systémem? Jaké může mít schopnosti a znalosti o našem systému?
+- **Mechanismy a indície** - z útoku sbíráme nějaká data, která potom analyzujeme, buď to jsou atomická data (třeba útočníkova IP), vypočítaná (celkový čas útoku), nebo behaviorální (co se na našem systému dělo divně?)
 
 ![](img/tactics.png)
 
 Na obrázku můžete vidět části konkrétního útoku. Příklad může být následovný:
-- **Taktika**: Eskalace privilegií a získání přístupu nad systémem
-- **Technika**: Využití vulnerability k prolomení SSH hesla uživatele + následné využití zastaralého balíčku v systému k získání sudo právům
+- **Taktika**: Eskalace privilegií a získání kontroly nad systémem
+- **Technika**: Využití vulnerability k prolomení SSH hesla uživatele + následné využití zastaralého balíčku v systému k získání sudo práv
 - **Procedury**: SW pro slovníkový útok pomocí hesla + CLI daného balíčku k získání přístupu
 
-Existují různé katalogy technik, taktik atd. Nejdůležitější z nich je MITRE ATT&CK. Ten obsahuje matice taktik a technik. Daná společnost také hodnotí jednotlivé antiviry a protection software, jak velké množství daných hrozeb dokáže detekovat a reagovat na ně. Také hodnotí přesnost daného SW v popisu jednotlivých hrozeb
+Existují různé katalogy technik, taktik atd. Nejdůležitější z nich je MITRE ATT&CK. Ten obsahuje matice taktik a technik. Daná společnost také hodnotí jednotlivé antiviry a protection software, jak velké množství daných hrozeb dokáže detekovat a reagovat na ně. Také hodnotí přesnost daného SW v popisu jednotlivých hrozeb. Příklad MITRE:
+- Taktika:  TA0001 – Initial Access tactic (taktika počiatočného prístupu)
+- Konkrétní technika: T1566.001 – Phishing: Spearphishing attachment (Phishing: Príloha pre spearphishing)
 
-Cyber threat hunting je proaktivní hledání nových hrozeb a možných útoků. Je velmi důležitý při hledání 0-day vulnerabilit. To jsou vulnerability, které nejsou veřejně známé, tudíž proti nim nejsou vydané security patche a jsou skrz to nebezpečné. Může se stát, že útočník má k dispozici danou vulnerabilitu několik měsíců/let, než ji odhalí tvůrce systému. Kombinaci 0-day vulnerabilit využíval například spyware Pegasus k ovládnutí celého systému chytrých telefonů. Společnosti vypisují bug bounty program, který má motivovat "hodné hackery" k hledání těchto chyb a jejich reportování společnostem. Ty jsou následně peněžně ohodnoceny firmami. Firmy dost často mívají i svůj red team, který má za úkol prolomit systém, chovat se jako útočník a reportovat zjištěné slabiny.
+**Cyber threat hunting** je proaktivní hledání nových hrozeb a možných útoků. Snažíme se odhalit možné hrozby a zranitelnosti, než je někdo dokáže použít k útoku. To v závislosti na informacích, které máme o hrozbách z různých katalogů atd. Můžeme ho dělat interně (zkoumání logů), nebo i pro nějaké 3rd party produkty a SW. Tento pojem zahrnuje i hledání již probíhajících útoků, které nedokázali např. zachytit automatizované systémy. **Bug bounty program** odměňuje lidi za hledání zranitelností v systémech. Je velmi důležitý při hledání 0-day vulnerabilit. To jsou vulnerability, které nejsou veřejně známé, tudíž proti nim nejsou vydané security patche a jsou skrz to nebezpečné. Může se stát, že útočník má k dispozici danou vulnerabilitu několik měsíců/let, než ji odhalí interní cyber threat hunting, nebo bug bounty program. Kombinaci 0-day vulnerabilit využíval například spyware Pegasus k ovládnutí celého systému chytrých telefonů. Bug bounty program má motivovat "hodné hackery" k hledání těchto chyb a jejich reportování společnostem. Ty jsou následně peněžně ohodnoceny firmami. Firmy dost často mívají i svůj red team, který má za úkol prolomit systém, chovat se jako útočník a reportovat zjištěné slabiny.
 
-### Příklady útoků
-- **0-day** - Útoky využívající zero-day zranitelností, tedy slabých míst v softwaru, o kterých výrobce ještě neví a neexistuje pro ně záplata. Příkladem je Stuxnet, kybernetická zbraň, která využívala několik zero-day exploitů k napadení íránského jaderného programu. Jedná se o kategorizaci závažnosti hrozby spíše než o její typ.
-- **Malware** - zahrnuje SW, který má za úkol škodit a nějak napadnout systém. Může zahrnovat mnoho různých typů škodlivého SW, který je dále kategorizován podle toho, jak má útočit. Na internetu existují databáze known malware souborů, které využívají většinou hash souboru. Příkladem databáze je VirusTotal.
-- **Ransomware** - má za úkol zašifrovat data na daném systému a poté většinou vyžadovat výkupné. Aktuálně typ malware, který je nejvíc na vzestupu. Mohli jsme vidět útoky i na nemocnici v Brně. Speciálním typem jsou wipery, které mají za úkol data smazat.
-- **0-click** - hlavně u smartphonů. Jedná se o útok, který nepotřebuje jakoukoliv interakci uživatele a většinou po sobě zamaže i stopy. Příkladem je Pegasus, který dokázal infikovat zařízení uživatelů jen pomocí pouhého zavolání, které ani daná osoba nemusela přijmout.
-- **Phishing** - tyto útoky zahrnují posílání podvodných e-mailů, které se zdají pocházet z důvěryhodných zdrojů, s cílem získat citlivé informace, jako jsou přihlašovací údaje a čísla kreditních karet. Slavným příkladem je útok na Hillary Clintonovou během prezidentské kampaně v USA v roce 2016.
-- **DDOS** - cílem těchto útoků je přetížit webové servery nebo sítě tak, aby se staly nedostupnými pro legitimní uživatele. DDOS útok je distribuovaný, to znamená, že útočí větší množství endpointů na server. Například v roce 2016 byl proveden masivní DDoS útok na službu Dyn, což vedlo k výpadku mnoha velkých webových stránek, včetně Twitteru a Netflixu.
-- **Insider threats** - tyto hrozby pochází od jedinců uvnitř organizace, kteří zneužívají svůj přístup k citlivým informacím. Jeden z nejznámějších případů je Edward Snowden, který v roce 2013 ukradl a zveřejnil tajné dokumenty NSA.
-- **Lateral movement** - útočníci používají k rozšíření svého dosahu v rámci síťové infrastruktury oběti po počátečním průniku. Tento pohyb umožňuje útočníkům získat přístup k dalším systémům a zdrojům v síti, často s cílem získat citlivé informace, způsobit škody nebo připravit terén pro další útoky.
 
-Existuje software, který dokáže jednotlivé útoky monitorovat a detekovat (detect) a v případě zájmu uživatele i udělat protiakci. Může se jednat o zablokování malware souborů s negativním hashem, zablokování škodlivého procesu, revert souborů u ransomware atd.
+**SIEM (Security Information and Event Management)** je systém pro detekci hrozeb a řízení bezpečnostních incidentů, který zahrnuje sběr a analýzu bezpečnostních událostí v reálném čase nebo historicky. Jeho klíčové schopnosti zahrnují shromažďování a správu logů událostí, analýzu dat z různých zdrojů a provozní nástroje jako dashboardy a reporty. 
+
+
+#### Příklady útoků
+- 0-day - Útoky využívající zero-day zranitelností, tedy slabých míst v softwaru, o kterých výrobce ještě neví a neexistuje pro ně záplata. Příkladem je Stuxnet, kybernetická zbraň, která využívala několik zero-day exploitů k napadení íránského jaderného programu. Jedná se o kategorizaci závažnosti hrozby spíše než o její typ.
+- Malware - zahrnuje SW, který má za úkol škodit a nějak napadnout systém. Může zahrnovat mnoho různých typů škodlivého SW, který je dále kategorizován podle toho, jak má útočit. Na internetu existují databáze known malware souborů, které využívají většinou hash souboru. Příkladem databáze je VirusTotal.
+- Ransomware - má za úkol zašifrovat data na daném systému a poté většinou vyžadovat výkupné. Aktuálně typ malware, který je nejvíc na vzestupu. Mohli jsme vidět útoky i na nemocnici v Brně. Speciálním typem jsou wipery, které mají za úkol data smazat.
+- 0-click - hlavně u smartphonů. Jedná se o útok, který nepotřebuje jakoukoliv interakci uživatele a většinou po sobě zamaže i stopy. Příkladem je Pegasus, který dokázal infikovat zařízení uživatelů jen pomocí pouhého zavolání, které ani daná osoba nemusela přijmout.
+- Phising - tyto útoky zahrnují posílání podvodných e-mailů, které se zdají pocházet z důvěryhodných zdrojů, s cílem získat citlivé informace, jako jsou přihlašovací údaje a čísla kreditních karet. Slavným příkladem je útok na Hillary Clintonovou během prezidentské kampaně v USA v roce 2016.
+- DDOS - cílem těchto útoků je přetížit webové servery nebo sítě tak, aby se staly nedostupnými pro legitimní uživatele. Například v roce 2016 byl proveden masivní DDoS útok na službu Dyn, což vedlo k výpadku mnoha velkých webových stránek, včetně Twitteru a Netflixe.
+- Insider threats - tyto hrozby pochází od jedinců uvnitř organizace, kteří zneužívají svůj přístup k citlivým informacím. Jeden z nejznámějších případů je Edward Snowden, který v roce 2013 ukradl a zveřejnil tajné dokumenty NSA.
+- Lateral movement - útočníci používají k rozšíření svého dosahu v rámci síťové infrastruktury oběti po počátečním průniku. Tento pohyb umožňuje útočníkům získat přístup k dalším systémům a zdrojům v síti, často s cílem získat citlivé informace, způsobit škody nebo připravit terén pro další útoky.
+- Advanced persistent threats - útok se snaží schovat, být v systému co nejdéle a odposlouchávat data, případně se z daných dat učit, jak co nejefektivněji provést poslední fázi útoku a uškodit co nejvíce, bývají to nejpromyšlenější útoky hlavně na větší organizace
+
+
+Existuje software, který dokáže jednotlivé útoky monitorovat a detekovat a v případě zájmu uživatele i udělat protiakci. Může se jednat o zablokování malware souborů s negativním hashem, zablokování škodlivého procesu, revert souborů u ransomware atd. Jedná se o EDR (Endpoint Detection and Response).
 
 ## Návrh bezpečnostních mechanismů
 Proces vytváření systémů, procesů a nástrojů, které chrání data, sítě a systémy před neoprávněným přístupem, zneužitím, ztrátou, změnou nebo poškozením
-Důvěrnost (Confidentiality): 
+- **Důvěrnost (Confidentiality)**: 
 Tento princip se týká ochrany informací před neautorizovaným přístupem nebo zveřejněním. Cílem je zajistit, aby měly k citlivým datům přístup pouze oprávněné osoby. To se obvykle dosahuje pomocí metod jako jsou šifrování, kontrola přístupu a autentizační protokoly. Mezi typ útoků, který nabouráva důvěrnost je například spyware.
 Spyware má za úkol např. špehovat uživatele a odkrývat citlivé informace, ke kterým by měli mít přístup jen autorizované osoby.
 
-Integrita (Integrity): Integrita zajišťuje, že data nejsou změněna nebo poškozena v neautorizovaném procesu. To zahrnuje ochranu proti neoprávněnému nebo náhodnému úpravě dat. Mechanismy zajišťující integritu zahrnuje hashování, digitální podpisy a systémy pro správu verzí. Při monitoringu systému se dosta často používá i kontrola hashování jednotlivých souborů.
+- **Integrita (Integrity)**: Integrita zajišťuje, že data nejsou změněna nebo poškozena v neautorizovaném procesu. To zahrnuje ochranu proti neoprávněnému nebo náhodnému úpravě dat. Mechanismy zajišťující integritu zahrnuje hashování, digitální podpisy a systémy pro správu verzí. Při monitoringu systému se dosta často používá i kontrola hashování jednotlivých souborů.
 
-Dostupnost (Availability): Tento princip zajišťuje, že data a informační systémy jsou dostupné a funkční pro oprávněné uživatele, když jsou potřeba. Dostupnost se zajistí pomocí redundance systémů, efektivního řízení síťových zdrojů, a plánováním obnovy po haváriích a katastrofách. Mezi útoky na dostupnost patří například ransomware, který znemožňuje fungování organizace a vyžaduje výkupné. Nejjednodušší a velmi klasický útok na dostupnost je potom DDOS.
+- **Dostupnost (Availability)**: Tento princip zajišťuje, že data a informační systémy jsou dostupné a funkční pro oprávněné uživatele, když jsou potřeba. Dostupnost se zajistí pomocí redundance systémů, efektivního řízení síťových zdrojů, a plánováním obnovy po haváriích a katastrofách. Mezi útoky na dostupnost patří například ransomware, který znemožňuje fungování organizace a vyžaduje výkupné. Nejjednodušší a velmi klasický útok na dostupnost je potom DDOS.
 
 Při návrhu bezpečnostních mechanismů je třeba brát v úvahu tyto důležité body:
 1. **Identifikace rizik a hrozeb**
@@ -84,23 +96,24 @@ Po identifikaci je důležité zvolit taktiku, kterou zvolíme pro zvýšení be
 
 Následně zvolíme vhodné konkrétní nástroje a postupy, které aplikujeme. Můžeme vybrat konkrétní firewall, můžeme využít služby cloudu, které dané služby nabízí
 
+#### Program informační bezpečnosti
+- Každá organizace by měla mít **program informační bezpečnosti**. Ten zahrnuje celkové pojetí, pravidla, postupy ohledně bezpečnosti organizace. Měl by být nastavený tak, aby dostatečně chránil organizaci před riziky a zároveň ji umožňoval růst.
 
-### Program informační bezpečnosti
-**Program informační bezpečnosti** je komplexní rámec zahrnující různé aspekty, jako jsou logické, administrativní a fyzické ochranné mechanismy, procesy, obchodní postupy a lidé, kteří spolupracují na zajištění ochrany prostředí. Hlavními cíli jsou:
+- Řízení bezpečnosti obsahuje potom všechny činnosti, aby program informační bezpečnosti fungoval a vyvíjel se. Na základě kontextu se posoudí rizika, vyřeší se, nebo se přijmou a monitorují. Může se dělat podobná matice rizik jako u projektového řízení.
 
-**Rovnováha mezi bezpečností a funkčností**: Program by měl vyvážit potřeby zabezpečení a podnikové funkčnosti, aby nedocházelo k negativnímu dopadu na produktivitu.
+- **Rovnováha mezi bezpečností a funkčností**: Program by měl vyvážit potřeby zabezpečení a podnikové funkčnosti, aby nedocházelo k negativnímu dopadu na produktivitu.
 
-**Komplexní přístup**: Všechny prvky - lidé, procesy, data a technologie - musí být chráněny. Bezpečnost zahrnuje nejen technická řešení, ale i správné chování a postupy.
+- **Komplexní přístup**: Všechny prvky - lidé, procesy, data a technologie - musí být chráněny. Bezpečnost zahrnuje nejen technická řešení, ale i správné chování a postupy.
 
-**Řízení rizik**: Obsahuje několik kroků, včetně posouzení a řešení rizik, a zahrnuje použití nástrojů jako je matice hodnocení rizik pro vizuální hodnocení a prioritizaci rizik.
+- **Řízení rizik**: Obsahuje několik kroků, včetně posouzení a řešení rizik, a zahrnuje použití nástrojů jako je matice hodnocení rizik pro vizuální hodnocení a prioritizaci rizik.
 
-**Bezpečnostní dokumentace**: Zahrnuje politiky, standardy, směrnice a postupy, které pomáhají zaměstnancům při správném rozhodování a dodržování právních požadavků.
+- **Bezpečnostní dokumentace**: Zahrnuje politiky, standardy, směrnice a postupy, které pomáhají zaměstnancům při správném rozhodování a dodržování právních požadavků.
 
-**Standardy a frameworky**: Program by měl být založen na standardizovaných bezpečnostních frameworkách, jako je ISO/IEC 27000 nebo NIST 800-39, a musí být přizpůsoben podle potřeb organizace.
+- **Standardy a frameworky**: Program by měl být založen na standardizovaných bezpečnostních frameworkách, jako je ISO/IEC 27000 nebo NIST 800-39, a musí být přizpůsoben podle potřeb organizace. ISO/IEC 27000 je sada mezinárodních norem pro řízení informační bezpečnosti, zaměřená na nastavení bezpečnostních procesů a politik v organizacích. Speciální publikace NIST 800-3 nabízí pokyny pro implementaci bezpečnostních opatření a řízení rizik v informačních systémech v souladu s americkými národními standardy.
 
-**Životní cyklus bezpečnostního programu**: Zahrnuje plánování, implementaci, provoz, monitorování a vyhodnocování, aby se zajistilo, že bezpečnostní opatření jsou vždy aktuální a efektivní.
+- **Životní cyklus bezpečnostního programu**: Zahrnuje plánování, implementaci, provoz, monitorování a vyhodnocování, aby se zajistilo, že bezpečnostní opatření jsou vždy aktuální a efektivní.
 
-Celkově program informační bezpečnosti vyžaduje komplexní a integrovaný přístup, který spojuje technické, organizační a lidské faktory k efektivní ochraně informací.
+- **Bezpečnostní politika (security policy)** je dokument na vysoké úrovni, který nastiňuje bezpečnostní směrnice vrcholového managementu. Termín politika se také používá k označení specifických bezpečnostních pravidel pro konkrétní systémy.
 
 ### Příklady
 - **Firewall** - "Zeď" mezi vnitřní a vnější sítí. Umožňuje povolování/zakazování určitého typu komunikace podle definovaných pravidel. Brání síť před potenciálně škodlivou komunikací. Ideální je blokovat spíše většinu komunikace a dávat povolení pro chtěnou -> to však může způsobit problémy se stabilitou a chtěnou propustností.
